@@ -1,10 +1,10 @@
 {
   "session": "S03",
-  "section": "\u2462 RAG",
-  "section_idx": 5,
+  "section": "Lab 2C",
+  "section_idx": 6,
   "sections_total": 10,
   "xp_total": 89,
-  "active_minutes": 47,
+  "active_minutes": 51,
   "quiz_answered": 10,
   "quiz_correct": 5,
   "labs_self_reported": {
@@ -13,5 +13,5 @@
     "lab2c": false
   },
   "participant": null,
-  "updated_at": "2026-10-05T07:04:39.020855+00:00"
+  "updated_at": "2026-10-05T07:09:38.323958+00:00"
 }
