@@ -3,8 +3,8 @@
   "section": "\u2460 Embeddings",
   "section_idx": 1,
   "sections_total": 10,
-  "xp_total": 9,
-  "active_minutes": 10,
+  "xp_total": 12,
+  "active_minutes": 12,
   "quiz_answered": 0,
   "quiz_correct": 0,
   "labs_self_reported": {
@@ -13,5 +13,5 @@
     "lab2c": false
   },
   "participant": null,
-  "updated_at": "2026-10-05T04:16:38.314421+00:00"
+  "updated_at": "2026-10-05T04:21:38.315203+00:00"
 }
