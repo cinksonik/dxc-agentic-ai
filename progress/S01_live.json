@@ -1,14 +1,14 @@
 {
   "session": "S01",
-  "section": "Lab A",
-  "section_idx": 2,
+  "section": "\u2461 Models",
+  "section_idx": 3,
   "sections_total": 9,
-  "xp_total": 0,
-  "active_minutes": 5,
-  "quiz_answered": 0,
-  "quiz_correct": 0,
+  "xp_total": 67,
+  "active_minutes": 42,
+  "quiz_answered": 3,
+  "quiz_correct": 2,
   "labs_self_reported": {
-    "labA": false,
+    "labA": true,
     "labB": false,
     "labC": false
   },
@@ -17,5 +17,5 @@
     "github_user": "askanilkumar",
     "team": "A"
   },
-  "updated_at": "2026-09-30T07:28:08.542960+00:00"
+  "updated_at": "2026-10-01T06:40:13.985087+00:00"
 }
