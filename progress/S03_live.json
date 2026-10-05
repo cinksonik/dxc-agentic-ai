@@ -4,7 +4,7 @@
   "section_idx": 5,
   "sections_total": 10,
   "xp_total": 74,
-  "active_minutes": 42,
+  "active_minutes": 44,
   "quiz_answered": 7,
   "quiz_correct": 4,
   "labs_self_reported": {
@@ -13,5 +13,5 @@
     "lab2c": false
   },
   "participant": null,
-  "updated_at": "2026-10-05T06:43:38.318361+00:00"
+  "updated_at": "2026-10-05T06:49:38.318321+00:00"
 }
