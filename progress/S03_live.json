@@ -1,17 +1,17 @@
 {
   "session": "S03",
-  "section": "\u2461 Chunking",
-  "section_idx": 3,
+  "section": "Lab 2B",
+  "section_idx": 4,
   "sections_total": 10,
-  "xp_total": 44,
-  "active_minutes": 33,
-  "quiz_answered": 4,
-  "quiz_correct": 3,
+  "xp_total": 60,
+  "active_minutes": 34,
+  "quiz_answered": 7,
+  "quiz_correct": 4,
   "labs_self_reported": {
     "lab2a": false,
     "lab2b": false,
     "lab2c": false
   },
   "participant": null,
-  "updated_at": "2026-10-05T06:28:38.318077+00:00"
+  "updated_at": "2026-10-05T06:34:24.557154+00:00"
 }
