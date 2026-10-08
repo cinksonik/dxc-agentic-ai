@@ -3,11 +3,17 @@ AskIT Marcin - A RAG app to chat with PDFs.
 Upload. Ask. Done.
 """
 
+import builtins
 import sys
 from pathlib import Path
 
+
+def safe_text(value):
+    return builtins.str(value)
+
+
 # Add repo root to path to import askit_core
-sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+sys.path.insert(0, safe_text(Path(__file__).resolve().parents[3]))
 
 import streamlit as st
 import numpy as np
@@ -88,7 +94,7 @@ def embed_text(text: str, client) -> list[float]:
             response["body"].read()
         )["embedding"]
     except Exception as e:
-        st.error(f"❌ Embedding failed. Check: .env keys, AWS region, Titan model access. Error: {str(e)[:100]}")
+        st.error(f"❌ Embedding failed. Check: .env keys, AWS region, Titan model access. Error: {safe_text(e)[:100]}")
         return None
 
 
@@ -182,9 +188,9 @@ if uploaded_file:
             # Step 2: Chunk the text
             st.session_state.chunks = []
             for text, page_num in all_text_with_pages:
-                for chunk_text in chunk_text(text, chunk_size, overlap):
+                for chunk in chunk_text(text, chunk_size, overlap):
                     st.session_state.chunks.append({
-                        "text": chunk_text,
+                        "text": chunk,
                         "page": page_num
                     })
             
@@ -211,7 +217,7 @@ if uploaded_file:
             )
         
         except Exception as e:
-            st.error(f"❌ Failed to build index. Error: {str(e)[:150]}")
+            st.error(f"❌ Failed to build index. Error: {safe_text(e)[:150]}")
 
 # ============================================================================
 # CHAT INTERFACE
@@ -294,7 +300,7 @@ if st.session_state.chunks and st.session_state.embeddings:
                 })
             
             except Exception as e:
-                st.error(f"❌ Chat failed. Check: .env keys, AWS region, Nova Micro model access. Error: {str(e)[:100]}")
+                st.error(f"❌ Chat failed. Check: .env keys, AWS region, Nova Micro model access. Error: {safe_text(e)[:100]}")
 else:
     if uploaded_file:
         st.info("👆 Click 'Build Index' to get started!")

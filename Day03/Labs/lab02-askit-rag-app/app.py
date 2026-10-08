@@ -3,6 +3,7 @@ AskIT RAG Lab — load the Orbit Corp IT knowledge base, chunk + embed + store i
 Stack: Streamlit | AWS Bedrock (main: Nova chat + Titan embeddings) or OpenAI (backup) | numpy + JSON (local vector store)
 Run:   streamlit run app.py
 """
+import builtins
 import hashlib
 import io
 import json
@@ -10,6 +11,10 @@ import os
 import time
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
+
+
+def safe_text(value):
+    return builtins.str(value)
 
 import numpy as np
 import streamlit as st
@@ -19,13 +24,134 @@ from pypdf import PdfReader
 
 # the course .env (AWS keys, Bedrock model id): search upward from this file, then the current folder
 _envs = [d / ".env" for d in Path(__file__).resolve().parents if (d / ".env").is_file()]
-ENV_FOUND = " + ".join(str(e) for e in _envs)
+ENV_FOUND = " + ".join(safe_text(e) for e in _envs)
 for _e in reversed(_envs):                      # farthest (course .env) first, nearest last; empty values never win
     for _k, _v in dotenv_values(_e).items():
         if _v:
             os.environ[_k] = _v
 load_dotenv()
 st.set_page_config(page_title="AskIT RAG Lab", page_icon="🔎", layout="wide")
+
+st.markdown(
+    """
+    <style>
+        :root {
+            --bg: #050505;
+            --panel: #111118;
+            --panel-2: #171721;
+            --line: rgba(168, 139, 250, 0.28);
+            --text: #f5f3ff;
+            --muted: #cbc7df;
+            --purple: #8b5cf6;
+            --purple-2: #a78bfa;
+            --purple-soft: rgba(139, 92, 246, 0.18);
+        }
+
+        html, body, [data-testid="stAppViewContainer"], [data-testid="stApp"] {
+            background: radial-gradient(circle at top, rgba(139, 92, 246, 0.12), transparent 30%), var(--bg) !important;
+            color: var(--text) !important;
+        }
+
+        .block-container {
+            padding-top: 2rem !important;
+            padding-bottom: 2.5rem !important;
+            max-width: 1400px !important;
+        }
+
+        [data-testid="stSidebar"] {
+            background: linear-gradient(180deg, rgba(17, 17, 24, 1), rgba(10, 10, 14, 1)) !important;
+            border-right: 1px solid var(--line) !important;
+            color: var(--text) !important;
+        }
+
+        .stApp, .stMarkdown, .stMarkdown p, .stMarkdown li, .stDataFrame, .stDataFrameContainer,
+        .stTextInput, .stSelectbox, .stNumberInput, .stTextArea, .stButton, .stTabs,
+        .stMetric, .stCaption, .stCheckbox, .stRadio, .stExpander {
+            color: var(--text) !important;
+        }
+
+        .stTabs [role="tablist"] {
+            gap: 0.5rem;
+        }
+
+        .stTabs [role="tab"] {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--line);
+            border-radius: 0.8rem;
+        }
+
+        .stTabs [role="tab"][aria-selected="true"] {
+            background: var(--purple-soft);
+            border-color: rgba(167, 139, 250, 0.6);
+        }
+
+        .stButton > button {
+            background: linear-gradient(180deg, var(--purple-2), var(--purple)) !important;
+            color: white !important;
+            border: 1px solid rgba(167, 139, 250, 0.9) !important;
+            border-radius: 0.8rem !important;
+            box-shadow: 0 8px 20px rgba(139, 92, 246, 0.28) !important;
+            font-weight: 600 !important;
+            transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+        }
+
+        .stButton > button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 24px rgba(139, 92, 246, 0.35) !important;
+        }
+
+        a {
+            color: #d8ccff !important;
+        }
+
+        .stProgress > div > div {
+            background: linear-gradient(90deg, var(--purple-2), var(--purple)) !important;
+        }
+
+        .stDataFrame, .stDataFrameContainer > div {
+            background: rgba(255,255,255,0.01) !important;
+            border: 1px solid var(--line) !important;
+            border-radius: 1rem !important;
+        }
+
+        .stMetric {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--line);
+            border-radius: 1rem;
+            padding: 1rem;
+        }
+
+        .stTextInput > div > div, .stSelectbox > div > div, .stNumberInput > div > div,
+        .stTextArea > div > div {
+            background: rgba(255,255,255,0.02) !important;
+            border: 1px solid var(--line) !important;
+            border-radius: 0.8rem !important;
+            color: var(--text) !important;
+        }
+
+        .stTextInput input, .stNumberInput input, .stTextArea textarea,
+        .stSelectbox div[data-baseweb="select"] {
+            color: var(--text) !important;
+        }
+
+        .stMarkdown h1, .stMarkdown h2, .stMarkdown h3 {
+            color: #f3f0ff !important;
+        }
+
+        .stAlert {
+            border-radius: 0.9rem !important;
+            border: 1px solid var(--line) !important;
+        }
+
+        .stChatMessage {
+            border-radius: 1rem !important;
+            border: 1px solid var(--line) !important;
+            background: rgba(255,255,255,0.02) !important;
+        }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
 BEDROCK_EMBED = "amazon.titan-embed-text-v2:0"
 OPENAI_EMBED = "text-embedding-3-small"
@@ -220,7 +346,7 @@ class LocalFile(io.BytesIO):
 
 # ---------------------------------------------------------------- Retry helper (handles 503 / 429)
 def is_transient(e):
-    s = str(e)
+    s = safe_text(e)
     return any(x in s for x in ("503", "429", "500", "Throttling", "ServiceUnavailable", "overloaded", "Rate limit"))
 
 
@@ -238,9 +364,21 @@ def with_retry(fn, tries=3):
 def extract_text(file) -> str:
     name = file.name.lower()
     if name.endswith(".pdf"):
-        return "\n".join(page.extract_text() or "" for page in PdfReader(file).pages)
+        try:
+            file.seek(0)
+            reader = PdfReader(file, strict=False)
+            return "\n".join(page.extract_text() or "" for page in reader.pages)
+        except Exception:
+            file.seek(0)
+            return ""
     if name.endswith(".docx"):
-        return "\n".join(p.text for p in Document(file).paragraphs)
+        try:
+            file.seek(0)
+            return "\n".join(p.text for p in Document(file).paragraphs)
+        except Exception:
+            file.seek(0)
+            return ""
+    file.seek(0)
     return file.read().decode("utf-8", errors="ignore")  # .txt / .md
 
 
@@ -295,7 +433,7 @@ def ingest(file):
                     metadatas=[{"source": file.name, "chunk": i} for i in range(len(chunks))])
             status.append(f"✅ {file.name}: {len(chunks)} chunks → {p}")
         except Exception as e:
-            status.append(f"⚠️ {file.name}: {p} indexing failed — {str(e)[:150]}")
+            status.append(f"⚠️ {file.name}: {p} indexing failed — {safe_text(e)[:150]}")
     return status
 
 
@@ -329,7 +467,7 @@ def retrieve(question, k):
             res = col.query(query_embeddings=[q_vec], n_results=min(k, col.count()))
             return list(zip(res["documents"][0], res["metadatas"][0], res["distances"][0])), p
         except Exception as e:
-            errors.append(f"{p}: {str(e)[:150]}")
+            errors.append(f"{p}: {safe_text(e)[:150]}")
     raise RuntimeError("Retrieval failed. " + " | ".join(errors) if errors else "No indexed documents.")
 
 
@@ -367,7 +505,7 @@ def generate(question, hits):
                                        {"role": "user", "content": prompt}]))
             return res.choices[0].message.content, model
         except Exception as e:
-            errors.append(f"{model}: {str(e)[:120]}")
+            errors.append(f"{model}: {safe_text(e)[:120]}")
     raise RuntimeError("All models failed. " + " | ".join(errors))
 
 
@@ -450,7 +588,7 @@ with st.expander("🧪 Mini eval — how good is my retrieval? (12 AskIT questio
             try:
                 hits, _prov = retrieve(q, top_k)
             except Exception as e:
-                errs = str(e)
+                errs = safe_text(e)
                 break
             arts = [m["source"].split("_")[0] for _, m, _ in hits]
             best = max((1 - d) for _, _, d in hits)
