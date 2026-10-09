@@ -241,7 +241,7 @@ python check.py 5b
 
 1. **Go to TODO-2 (2 min).** In `agent.py` press **Ctrl+F**, type `TODO-2` and press Enter. You land on the function `needs_approval`.
 
-2. **Write TODO-2 (5 min).** It is one line. Replace `return False` with a line that returns `True` for `update_ticket` and `reset_password`, and `False` for everything else. (Answer: Hints file, section **TODO-2**.) Save (Ctrl+S).
+2. **Write TODO-2 (5 min).** It is one line. Replace `return name in ("update_ticket", "reset_password")` with a line that returns `True` for `update_ticket` and `reset_password`, and `False` for everything else. (Answer: Hints file, section **TODO-2**.) Save (Ctrl+S).
 
    The function `run_tool_safely` right below is already built. It uses your `needs_approval` to decide whether to ask a human.
 
